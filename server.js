@@ -4,14 +4,15 @@ const puppeteer = require('puppeteer-core');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// API Key টা এখানে কোটেশন (' ') এর ভেতরে স্ট্রিং হিসেবে দেওয়া হলো
+// আপনার Browserless API Key
 const BROWSERLESS_API_KEY = '2UNi96uG4emeJdQdcc02deb50049087aa1c434ed5f3f4b3d8'; 
 
 app.get('/samui', async (req, res) => {
     const id = req.query.id;
     if (!id) return res.status(400).json({ error: "?id= required" });
 
-    const url = `https://samui390dod.com/play/${id}`;
+    // ডোমেইন আপডেট করা হয়েছে hrujo406fix.com এ
+    const url = `https://hrujo406fix.com/play/${id}`;
     let browser = null;
 
     try {
@@ -19,7 +20,7 @@ app.get('/samui', async (req, res) => {
         browser = await puppeteer.connect({
             browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_API_KEY}&--ignore-certificate-errors`,
             defaultViewport: null,
-            ignoreHTTPSErrors: true // SSL এরর ইগনোর করার মেইন কমান্ড!
+            ignoreHTTPSErrors: true // SSL এরর ইগনোর করার মেইন কমান্ড
         });
         
         const page = await browser.newPage();
@@ -36,13 +37,13 @@ app.get('/samui', async (req, res) => {
             }
         });
 
-        // SSL এরর থাকলেও পেজ লোড করবে
+        // পেজ লোড করবে
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 20000 });
         await new Promise(r => setTimeout(r, 2000));
         await browser.close();
 
         if (m3u8Url) {
-            res.redirect(m3u8Url); 
+            res.redirect(m3u8Url); // সরাসরি Oxoo তে রিডাইরেক্ট!
         } else {
             res.status(500).json({ error: "M3U8 not found." });
         }
