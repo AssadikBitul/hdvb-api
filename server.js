@@ -1,7 +1,11 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core'); // Lightweight core
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// আপনার Browserless.io এর API Key এখানে বসান
+const BROWSERLESS_API_KEY = '2UNi96uG4emeJdQdcc02deb50049087aa1c434ed5f3f4b3d8'; 
 
 app.get('/samui', async (req, res) => {
     const id = req.query.id;
@@ -11,10 +15,12 @@ app.get('/samui', async (req, res) => {
     let browser = null;
 
     try {
-        browser = await puppeteer.launch({
-            headless: 'new',
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+        // Render সার্ভারের বদলে ক্লাউড ব্রাউজার ব্যবহার করবে (সুপার ফাস্ট!)
+        browser = await puppeteer.connect({
+            browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_API_KEY}`,
+            defaultViewport: null
         });
+        
         const page = await browser.newPage();
         let m3u8Url = null;
 
@@ -34,7 +40,7 @@ app.get('/samui', async (req, res) => {
         await browser.close();
 
         if (m3u8Url) {
-            res.redirect(m3u8Url); // Direct redirect to Oxoo!
+            res.redirect(m3u8Url); // সরাসরি Oxoo তে রিডাইরেক্ট!
         } else {
             res.status(500).json({ error: "M3U8 not found." });
         }
