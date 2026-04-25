@@ -4,8 +4,8 @@ const puppeteer = require('puppeteer-core');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// আপনার Browserless.io এর API Key এখানে বসান
-const BROWSERLESS_API_KEY = 'YOUR_API_KEY_HERE'; 
+// API Key টা এখানে কোটেশন (' ') এর ভেতরে স্ট্রিং হিসেবে দেওয়া হলো
+const BROWSERLESS_API_KEY = '2UNi96uG4emeJdQdcc02deb50049087aa1c434ed5f3f4b3d8'; 
 
 app.get('/samui', async (req, res) => {
     const id = req.query.id;
@@ -17,8 +17,7 @@ app.get('/samui', async (req, res) => {
     try {
         // Cloud Browser Connection with SSL Error Bypass
         browser = await puppeteer.connect({
-            // URL এর সাথে --ignore-certificate-errors যুক্ত করা হলো
-            browserWSEndpoint: `wss://chrome.browserless.io?token=${2UNi96uG4emeJdQdcc02deb50049087aa1c434ed5f3f4b3d8}&--ignore-certificate-errors`,
+            browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_API_KEY}&--ignore-certificate-errors`,
             defaultViewport: null,
             ignoreHTTPSErrors: true // SSL এরর ইগনোর করার মেইন কমান্ড!
         });
