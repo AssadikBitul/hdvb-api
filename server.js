@@ -1,11 +1,11 @@
 const express = require('express');
-const puppeteer = require('puppeteer-core'); // Lightweight core
+const puppeteer = require('puppeteer-core');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // আপনার Browserless.io এর API Key এখানে বসান
-const BROWSERLESS_API_KEY = '2UNi96uG4emeJdQdcc02deb50049087aa1c434ed5f3f4b3d8'; 
+const BROWSERLESS_API_KEY = 'YOUR_API_KEY_HERE'; 
 
 app.get('/samui', async (req, res) => {
     const id = req.query.id;
@@ -15,10 +15,12 @@ app.get('/samui', async (req, res) => {
     let browser = null;
 
     try {
-        // Render সার্ভারের বদলে ক্লাউড ব্রাউজার ব্যবহার করবে (সুপার ফাস্ট!)
+        // Cloud Browser Connection with SSL Error Bypass
         browser = await puppeteer.connect({
-            browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_API_KEY}`,
-            defaultViewport: null
+            // URL এর সাথে --ignore-certificate-errors যুক্ত করা হলো
+            browserWSEndpoint: `wss://chrome.browserless.io?token=${2UNi96uG4emeJdQdcc02deb50049087aa1c434ed5f3f4b3d8}&--ignore-certificate-errors`,
+            defaultViewport: null,
+            ignoreHTTPSErrors: true // SSL এরর ইগনোর করার মেইন কমান্ড!
         });
         
         const page = await browser.newPage();
@@ -35,12 +37,13 @@ app.get('/samui', async (req, res) => {
             }
         });
 
+        // SSL এরর থাকলেও পেজ লোড করবে
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 20000 });
         await new Promise(r => setTimeout(r, 2000));
         await browser.close();
 
         if (m3u8Url) {
-            res.redirect(m3u8Url); // সরাসরি Oxoo তে রিডাইরেক্ট!
+            res.redirect(m3u8Url); 
         } else {
             res.status(500).json({ error: "M3U8 not found." });
         }
